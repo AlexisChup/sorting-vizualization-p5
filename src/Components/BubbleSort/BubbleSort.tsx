@@ -9,12 +9,12 @@ import {initLines, swap} from '../../utils/lines'
 
 import {useDispatch, useSelector} from 'react-redux'
 
-import { CanvasState, UPDATE_CANVAS } from '../../redux/types'
+import { CanvasState, END_SORTING, INIT_LINES } from '../../redux/types'
 
 export const BubbleSort = (props: CanvasProps) => {
     const {canvasHeight, canvasWidth} = props
     const reduxState: CanvasState = useSelector((state: CanvasState) => state)
-    const {isSorting, strokeWeight, lines} = reduxState
+    const {isStarted, isPaused, isEnded, strokeWeight, lines} = reduxState
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -27,11 +27,8 @@ export const BubbleSort = (props: CanvasProps) => {
 
     const setLinesRedux = () => {
         dispatch({
-            payload: {
-                ...reduxState,
-                lines: initLines(canvasWidth, canvasHeight, strokeWeight)
-            },
-            type: UPDATE_CANVAS
+            payload: initLines(canvasWidth, canvasHeight, strokeWeight),
+            type: INIT_LINES
         })
     }
 
@@ -41,7 +38,7 @@ export const BubbleSort = (props: CanvasProps) => {
 	const setup = (p5: p5Types, canvasParentRef: Element) => {
         p5.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef);
         p5.strokeCap(p5.SQUARE);
-        p5.frameRate(10)
+        p5.frameRate(30)
 
         // p5.noLoop()
 	};
@@ -49,7 +46,7 @@ export const BubbleSort = (props: CanvasProps) => {
 	const draw = (p5: p5Types) => {
         p5.background(0);
         
-        if(isSorting) {
+        if(isStarted && !isPaused  && !isEnded) {
             // p5.loop()
             // Iterate over array & swap values when i > i+1
             if (i < lines.length) {
@@ -65,9 +62,13 @@ export const BubbleSort = (props: CanvasProps) => {
             } else {
                 console.log("Bubble sorting finished")
                 p5.noLoop()
+                dispatch({
+                    payload: {},
+                    type: END_SORTING
+                })
             }
     
-            // if(!isSorting) {
+            // if(!isStarted) {
             i++;
                 // setColorEndedLine(lines, i);
             // }
