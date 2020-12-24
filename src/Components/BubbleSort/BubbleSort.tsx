@@ -1,41 +1,56 @@
-import React, {useState} from 'react'
+import React, {useEffect} from 'react'
 
 import Sketch from "react-p5";
 import p5Types from "p5"; 
 
 import { LineProps, CanvasProps } from '../index.d'
 
-import {
-    useSelector,
-} from 'react-redux'
+import {initLines, swap} from '../../utils/lines'
 
-import { CanvasState } from '../../redux/types'
+import {useDispatch, useSelector} from 'react-redux'
+
+import { CanvasState, UPDATE_CANVAS } from '../../redux/types'
 
 export const BubbleSort = (props: CanvasProps) => {
-    const [isSortingEnded, setIsSortingEnded] = useState(false)
-    const [isSortingStarted, setIsSortingStarted] = useState(false)
+    const {canvasHeight, canvasWidth} = props
+    const reduxState: CanvasState = useSelector((state: CanvasState) => state)
+    const {isSorting, strokeWeight, lines} = reduxState
+    const dispatch = useDispatch()
 
-    const isSorting: boolean = useSelector((state: CanvasState) => state.isSorting)
-    console.log("isSorting : ", isSorting)
+    useEffect(() => {
+        
+    }, [])
 
-    let strokeWeight = 10;
-    let lines = initLines(props.canvasWidth, props.canvasHeight, strokeWeight);
+    useEffect(() => {
+        setLinesRedux()
+    }, [props.canvasWidth])
 
-    let i = 0;
+    const setLinesRedux = () => {
+        dispatch({
+            payload: {
+                ...reduxState,
+                lines: initLines(canvasWidth, canvasHeight, strokeWeight)
+            },
+            type: UPDATE_CANVAS
+        })
+    }
+
+    let i = 0; 
 
 	//See annotations in JS for more information
 	const setup = (p5: p5Types, canvasParentRef: Element) => {
-        p5.createCanvas(props.canvasWidth, props.canvasHeight).parent(canvasParentRef);
+        p5.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef);
         p5.strokeCap(p5.SQUARE);
-        p5.frameRate(60)
+        p5.frameRate(10)
 
-        p5.noLoop()
+        // p5.noLoop()
 	};
 
 	const draw = (p5: p5Types) => {
         p5.background(0);
         
-        if(isSortingStarted) {
+        if(isSorting) {
+            // p5.loop()
             // Iterate over array & swap values when i > i+1
             if (i < lines.length) {
                 for (let index = 0; index < lines.length - 1 - i; index++) {
@@ -49,22 +64,24 @@ export const BubbleSort = (props: CanvasProps) => {
                 }
             } else {
                 console.log("Bubble sorting finished")
-                setIsSortingEnded(true)
                 p5.noLoop()
             }
     
-            if(!isSortingEnded) {
-                i++;
-                setColorEndedLine(lines, i);
-            }
+            // if(!isSorting) {
+            i++;
+                // setColorEndedLine(lines, i);
+            // }
     
             // draw
+        } else {
+            // p5.noLoop()
         }
+
         drawLines(p5, props, strokeWeight, lines)
     };
     
     const windowResized = (p5: p5Types) => {
-        p5.resizeCanvas(props.canvasWidth, props.canvasHeight);
+        p5.resizeCanvas(canvasWidth, canvasHeight);
     }
 
     return(
@@ -79,38 +96,7 @@ export const BubbleSort = (props: CanvasProps) => {
     );
 }
 
-const initLines = (canvasWidth: number, canvasHeight: number, strokeWeight: number) => {
-    let lines: LineProps [] = [];
-    let LineProps: LineProps;
-
-    let r: number, g: number, b: number, value: number;
-
-    for (let index = 0; index < Math.trunc(canvasWidth / strokeWeight) + 1; index++) {
-        r = Math.random() * 155 + 100;
-        g = Math.random() * 155 + 100;
-        b = Math.random() * 155 + 100;
-        value = Math.random() * canvasHeight;
-        
-        LineProps = {
-            color: {r, g, b},
-            value,
-        }
-
-        lines[index] = LineProps;
-    }
-
-    return lines;
-}
-
-const swap = (lines: LineProps[], index: number) => {
-    let tempLine:LineProps = lines[index];
-
-    // swap lines
-    lines[index] = lines[index + 1];
-    lines[index + 1] = tempLine;
-}
-
-const drawLines = (p5: p5Types, props: CanvasProps, strokeWeight: number, lines: LineProps[]) => {
+export const drawLines = (p5: p5Types, props: CanvasProps, strokeWeight: number, lines: LineProps[]) => {
     for (let index = 0; index < lines.length; index++) {
         // line color
         const {r, b, g} = lines[index].color;
@@ -122,17 +108,7 @@ const drawLines = (p5: p5Types, props: CanvasProps, strokeWeight: number, lines:
     }  
 }
 
-const setColorEndedLine = (lines: LineProps[], index: number) => {
-    let colorEnded = {
-        r: 255,
-        g: 0,
-        b: 0,
-    }
 
-    if(lines.length - index >= 0) {
-        lines[lines.length - index].color = colorEnded
-    }
-}
 
 
 

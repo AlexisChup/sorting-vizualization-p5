@@ -1,17 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { BubbleSort } from '../BubbleSort/BubbleSort'
+import {FooterContainerSketch} from './FooterContainerSketch'
 
-import { Button } from 'react-bootstrap'
 
-import { CanvasState, UPDATE_CANVAS } from '../../redux/types'
-import {useDispatch, useSelector} from 'react-redux'
 
 export const ContainerSketch = () => {
+    console.log('ContainerSketch')
     const parentRef   = useRef<HTMLDivElement>(null);
     const [canvasWidth, setCanvasWidth] = useState(0)
-
-    const dispatch = useDispatch()
-    const reduxState: CanvasState = useSelector((state: CanvasState) => state)
 
     useEffect ( () => {
         window.addEventListener('resize', resizeCanvas);
@@ -21,22 +17,12 @@ export const ContainerSketch = () => {
         return () => {
             window.removeEventListener('resize', resizeCanvas);
         }
-    });
+    }, []);
 
     const resizeCanvas = () => {
         if(parentRef.current){
             setCanvasWidth(parentRef.current.offsetWidth * 0.9)  
         } 
-    }
-    
-    const setIsSortingRedux = () => {
-        dispatch({
-            payload: {
-                ...reduxState,
-                isSorting: !reduxState.isSorting
-            },
-            type: UPDATE_CANVAS
-        })  
     }
 
     return (
@@ -58,9 +44,7 @@ export const ContainerSketch = () => {
                 </div>
             </div>
             <div className="row py-2 justify-content-center">
-                <Button size="sm" variant={reduxState.isSorting ? "outline-danger" : "outline-primary"} onClick={() => setIsSortingRedux()}>
-                    {reduxState.isSorting ? "Pause" : "Start"} sorting
-                </Button>
+                <FooterContainerSketch />
             </div>
         </div>
     )
