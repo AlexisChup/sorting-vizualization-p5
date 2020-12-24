@@ -44,7 +44,10 @@ export const ContainerSketch = () => {
                 </div>
             </div>
             <div className="row py-2 justify-content-center">
-                <FooterContainerSketch />
+                <FooterContainerSketch 
+                    canvasWidth={ canvasWidth }
+                    canvasHeight={300}
+                />
             </div>
         </div>
     )

@@ -61,7 +61,7 @@ export const BubbleSort = (props: CanvasProps) => {
                 }
             } else {
                 console.log("Bubble sorting finished")
-                p5.noLoop()
+                // p5.noLoop()
                 dispatch({
                     payload: {},
                     type: END_SORTING

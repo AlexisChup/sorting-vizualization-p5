@@ -20,7 +20,7 @@ export const swap = (lines: LineProps[], index: number) => {
     lines[index + 1] = tempLine;
 }
 
-export const initLines = (canvasWidth: number, canvasHeight: number, strokeWeight: number) => {
+export const initLines = (canvasWidth: number, canvasHeight: number, strokeWeight: number): LineProps [] => {
     console.log("initLines, canvasW + H", canvasWidth, canvasHeight, " st", strokeWeight);
     let lines: LineProps [] = [];
     let LineProps: LineProps;

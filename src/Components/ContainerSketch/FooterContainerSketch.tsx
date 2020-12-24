@@ -4,35 +4,50 @@ import { Button } from 'react-bootstrap'
 
 import { CanvasState, INIT_LINES, PAUSE_SORTING, START_SORTING, RESUME_SORTING } from '../../redux/types'
 import {useDispatch, useSelector} from 'react-redux'
+import {initLines} from '../../utils/lines'
+
+import {LineProps} from '../index'
 
 
 interface Props {
-    
+    canvasWidth: number;
+    canvasHeight: number;
 }
 
 export const FooterContainerSketch = (props: Props) => {
     const reduxState: CanvasState = useSelector((state: CanvasState) => state)
     const dispatch = useDispatch()
 
-    const {isStarted, isEnded, isPaused} = reduxState
+    const {isStarted, isEnded, isPaused, strokeWeight} = reduxState
+    const {canvasWidth, canvasHeight} = props
     
     const setisStartedRedux = () => {
         let type;
+        let payload: any;
+        let action;
         
         if(!isStarted && !isEnded){
-            type = START_SORTING
+            action = {
+                type: START_SORTING,
+                payload: {}
+            }
         } else if (isStarted && !isPaused && !isEnded) {
-            type = PAUSE_SORTING
+            action = {
+                type: PAUSE_SORTING,
+                payload: {}
+            }
         } else if (isStarted && isPaused && !isEnded) {
-            type = RESUME_SORTING
-        }
-
-        dispatch({
-            payload: {
-                ...reduxState,
-            },
-            type
-        })  
+            action = {
+                type: RESUME_SORTING,
+                payload: {}
+            }
+        } else if (isEnded) {
+            action = {
+                type: INIT_LINES,
+                payload: initLines(canvasWidth, canvasHeight, strokeWeight)
+            }
+        } 
+        dispatch(action)  
     }
 
     let buttonName, buttonColor;
